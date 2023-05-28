@@ -1,0 +1,1 @@
+zip upload.zip ../../frontend/dist/frontend/assets/public/videos/owasp_promo.vtt
