@@ -16,11 +16,7 @@ module.exports = function retrieveLoggedInUser () {
     try {
       if (security.verify(req.cookies.token)) {
         user = security.authenticatedUsers.get(req.cookies.token)
-      }
-    } catch (err) {
-      user = undefined
-    } finally {
-      const response = { user: { id: (user?.data ? user.data.id : undefined), email: (user?.data ? user.data.email : undefined), lastLoginIp: (user?.data ? user.data.lastLoginIp : undefined), profileImage: (user?.data ? user.data.profileImage : undefined) } }
+        const response = { user: { id: (user?.data ? user.data.id : undefined)}}
       if (req.query.callback === undefined) {
         res.json(response)
       } else {
@@ -28,5 +24,10 @@ module.exports = function retrieveLoggedInUser () {
         res.jsonp(response)
       }
     }
+    } catch (err) {
+      user = undefined
+      res.status(400).json({ error: 'Unauthorized' })
+    }
+    }
   }
-}
+

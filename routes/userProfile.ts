@@ -26,7 +26,10 @@ module.exports = function getUserProfile () {
         UserModel.findByPk(loggedInUser.data.id).then((user: UserModel | null) => {
           let template = buf.toString()
           let username = user?.username
-          if (username?.match(/#{(.*)}/) !== null && !utils.disableOnContainerEnv()) {
+          const filteredUsername = username?.replace(/[^a-zA-Z0-9#@]+/g, '');
+          const escapedUsername = filteredUsername?.replace(/[#@]/g, (match) => `\\${match}`);
+          username = escapedUsername;
+          /* if (username?.match(/#{(.*)}/) !== null && !utils.disableOnContainerEnv()) {
             req.app.locals.abused_ssti_bug = true
             const code = username?.substring(2, username.length - 1)
             try {
@@ -39,7 +42,7 @@ module.exports = function getUserProfile () {
             }
           } else {
             username = '\\' + username
-          }
+          } */
           const theme = themes[config.get<string>('application.theme')]
           if (username) {
             template = template.replace(/_username_/g, username)
@@ -54,8 +57,8 @@ module.exports = function getUserProfile () {
           template = template.replace(/_primDark_/g, theme.primDark)
           template = template.replace(/_logo_/g, utils.extractFilename(config.get('application.logo')))
           const fn = pug.compile(template)
-          const CSP = `img-src 'self' ${user?.profileImage}; script-src 'self' 'unsafe-eval' https://code.getmdl.io http://ajax.googleapis.com`
-          challengeUtils.solveIf(challenges.usernameXssChallenge, () => { return user?.profileImage.match(/;[ ]*script-src(.)*'unsafe-inline'/g) !== null && utils.contains(username, '<script>alert(`xss`)</script>') })
+          const CSP = `img-src 'self' http://localhost:3000/assets/public/images/uploads/; script-src 'self' https://code.getmdl.io/1.3.0/material.min.js http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js ; object-src 'none'; require-trusted-types-for 'script'`
+          //challengeUtils.solveIf(challenges.usernameXssChallenge, () => { return user?.profileImage.match(/;[ ]*script-src(.)*'unsafe-inline'/g) !== null && utils.contains(username, '<script>alert(`xss`)</script>') })
 
           res.set({
             'Content-Security-Policy': CSP

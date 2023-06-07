@@ -45,7 +45,7 @@ router.get('/', async (req: Request, res: Response, next: NextFunction): Promise
 })
 
 interface DataErasureRequestParams {
-  layout?: string
+  //layout?: string
   email: string
   securityAnswer: string
 }
@@ -65,7 +65,7 @@ router.post('/', async (req: Request<{}, {}, DataErasureRequestParams>, res: Res
     })
 
     res.clearCookie('token')
-    if (req.body.layout !== undefined) {
+     /*if (req.body.layout !== undefined) {
       const filePath: string = path.resolve(req.body.layout).toLowerCase()
       const isForbiddenFile: boolean = (filePath.includes('ftp') || filePath.includes('ctf.key') || filePath.includes('encryptionkeys'))
       if (!isForbiddenFile) {
@@ -87,10 +87,10 @@ router.post('/', async (req: Request<{}, {}, DataErasureRequestParams>, res: Res
       res.render('dataErasureResult', {
         ...req.body
       })
-    }
+    }*/
   } catch (error) {
     next(error)
-  }
+  } 
 })
 
 export default router
