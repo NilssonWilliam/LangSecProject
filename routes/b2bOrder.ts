@@ -15,11 +15,9 @@ const challenges = require('../data/datacache').challenges
 module.exports = function b2bOrder () {
   return ({ body }: Request, res: Response, next: NextFunction) => {
     if (!utils.disableOnContainerEnv()) {
-      const orderLinesData = body.orderLinesData || ''
+      const orderLinesData = body.orderLinesData || '{}'
       try {
-        const sandbox = { safeEval, orderLinesData }
-        vm.createContext(sandbox)
-        vm.runInContext('safeEval(orderLinesData)', sandbox, { timeout: 2000 })
+        JSON.parse(orderLinesData) // This is not used though, but added to show a proper implementation
         res.json({ cid: body.cid, orderNo: uniqueOrderNumber(), paymentDue: dateTwoWeeksFromNow() })
       } catch (err) {
         if (utils.getErrorMessage(err).match(/Script execution timed out.*/)) {
